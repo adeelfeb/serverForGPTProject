@@ -1,46 +1,31 @@
+import express from "express"
+import ImageKit from "imagekit"
+import dotenv from "dotenv";
+import cors from "cors"
 
-const obj = {
-    x: 30,
-    funcc: function(){
-        const nested = ()=>{
-            console.log("Int heneseed")
-            console.log(this)
-        }
-        nested()
-    }
-}
+dotenv.config();
 
 
-const obj2 ={
-    x: 45,
-    y:2
-}
+const imagekit = new ImageKit({
+    urlEndpoint: process.env.IMAGE_KIT_ENDPOINT,
+    publicKey: process.env.IMAGE_KIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGE_KIT_PRIVATE_KEY
+})
 
-// obj.funcc()
-// obj.funcc.call(obj2)
+const port = process.env.PORT || 3000
 
-const button = {
-    label: "Click me",
-    handleClick: function() {
-        console.log("Button label:", this.label);
-    }
-};
+const app = express() 
+app.use(cors({
+    origin: process.env.CLIENT_URL
+}))
 
-// // Use `.bind()` to fix `this`
-// const simulateClick = button.handleClick.bind(button);
-// simulateClick(); // Button label: Click me
-const simulateClick = button.handleClick;
-simulateClick.call(button); // Button label: Click me
+app.get("/api/upload", (req, res)=>{
+    const result = imagekit.getAuthenticationParameters();
+    res.send(result)
+})
 
-
-const button2 = {
-    label: "Click me",
-    handleClick: function() {
-        const nested = () => {
-            console.log("Button label:", this.label);
-        };
-        nested();
-    }
-};
-
-button2.handleClick(); // Button label: Click me
+app.listen(port, ()=>{
+    console.log(
+        "server at :", port
+    )
+})
